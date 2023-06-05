@@ -1,0 +1,21 @@
+
+git clone git@github.com:maxmin13/ansible-prj.git
+
+open PyDev perspective
+
+File, new PyDev project
+
+project name: ansible-prj
+select the root ansible-prj directory
+configure python3.9 interpreter
+click finish
+
+Project, properties
+
+select PyDev - PYTHONPATH, Source Folders
+Add source folder
+
+directory project and directory tests.
+
+Apply 
+

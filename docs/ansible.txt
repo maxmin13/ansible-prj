@@ -3,7 +3,7 @@
 cd /home/vagrant/python_venv
 source bin/activate
 
-cd workspace/awspy-prj/provision
+cd workspace/ansible-prj/provision
 ##################################
 
 # pipreqs module. It is used to scan your imports and build a Python requirements file for you.
