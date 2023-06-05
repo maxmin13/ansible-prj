@@ -1,0 +1,3 @@
+psg:
+  db_name: postgresdb
+  db_user: postgresadmin 

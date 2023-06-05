@@ -1,0 +1,2 @@
+instance_domain: db.maxmin.it
+ansible_private_key_file: /home/vagrant/python_venv/workspace/awspy-prj/access/db-key

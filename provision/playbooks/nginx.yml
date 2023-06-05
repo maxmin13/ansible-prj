@@ -1,0 +1,97 @@
+- name: Configure a webserver with nginx
+  hosts:
+    - class_webserver
+  gather_facts: true
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted
+  tasks:
+  
+    - name: Print out operating system details
+      ansible.builtin.debug:
+        msg: 
+        - "os_family: {{ ansible_facts.os_family }}"
+        - "distro: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
+        - "kernel: {{ ansible_facts.kernel }}" 
+              
+    - name: Display variables
+      ansible.builtin.debug:
+        msg:
+        - "instance variables:"
+        - "domain: {{ instance_domain }}"
+        - "ssh key: {{ ansible_private_key_file }}"
+        - "nginx variables:"  
+        - "tls_dir: {{ nginx.tls_dir }}"  
+        - "key_file: {{ nginx.key_file }}" 
+        - "cert_file: {{ nginx.cert_file }}"   
+        - "install_dir: {{ nginx.install_dir }}" 
+        - "root_dir: {{ nginx.root_dir }}" 
+        - "http_port: {{ nginx.http_port }}"
+        - "https_port: {{ nginx.https_port }}" 
+                     
+    - name: Ensure nginx is installed
+      ansible.builtin.package:
+        name: nginx
+        update_cache: true
+      notify: Restart nginx
+      
+    - name: Create directories for nginx TLS certificates
+      ansible.builtin.file:
+        path: '{{ nginx.tls_dir }}'
+        state: directory
+        mode: 488
+      notify: Restart nginx
+      
+    - name: Copy nginx TLS files
+      copy:
+        src: '{{ item }}'
+        dest: '{{ nginx.tls_dir }}'
+        mode: 384
+      loop:
+        - 'nginx/{{ instance_domain }}/{{ nginx.key_file }}'
+        - 'nginx/{{ instance_domain }}/{{ nginx.cert_file }}'
+      notify: Restart nginx
+      
+    - name: Nginx config file
+      ansible.builtin.template:
+        src: nginx/nginx.conf.j2
+        dest: '{{ nginx.install_dir }}/nginx.conf'
+        mode: 436
+      notify: Restart nginx
+      vars:
+        server_name: '{{ nginx.server_name }}'
+        
+    - name: Copy index.html
+      ansible.builtin.template:
+        src: nginx/index.html.j2
+        dest: '{{ nginx.root_dir }}/index.html'
+        mode: 436
+        
+    - name: Restart nginx
+      meta: flush_handlers
+      
+    - name: Test it! http://{{ instance_domain }}:{{ nginx.http_port }}/index.html
+      become: false
+      uri:
+        url: 'http://{{ instance_domain }}:{{ nginx.http_port }}/index.html'
+        method: GET
+        status_code: 200
+        return_content: true
+      register: this
+      failed_when: "'Running on ' not in this.content"
+      
+    - name: Test it! https://{{ instance_domain }}:{{ nginx.https_port }}/index.html
+      become: false
+      uri:
+        url: 'https://{{ instance_domain }}:{{ nginx.https_port }}/index.html'
+        method: GET
+        status_code: 200
+        validate_certs: false
+        return_content: true
+      register: result
+
+      
+...
+      

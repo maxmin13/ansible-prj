@@ -1,0 +1,4 @@
+
+rm -f ~/.ssh/known_hosts && ssh -v -i db-key -p 22 awsadmin@18.203.158.128
+
+rm -f ~/.ssh/known_hosts && ssh -v -i guest-key -p 22 awsadmin@54.171.253.117

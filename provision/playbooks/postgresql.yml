@@ -1,0 +1,133 @@
+- name: Configure an instance with postgres
+  hosts:
+    - class_db
+  gather_facts: false
+  vars_files:
+    - constants/secrets.yml
+    
+  handlers:
+    - name: restart postgres
+      service: name=postgresql state=restarted    
+      
+  pre_tasks:
+  
+    - name: upgrade all packages
+      ansible.builtin.yum: name=* state=latest  
+           
+    - name: Install a list of packages 
+      ansible.builtin.yum:
+        name:
+          - postgresql
+          - postgresql-server
+          
+    - name: "Install Python packages that allows Ansible modules to interact with the database"
+      ansible.builtin.pip: "name={{ item }}  state=present"
+      with_items:
+        - psycopg2-binary
+
+  
+  tasks: 
+    - name: Display variables
+      ansible.builtin.debug:
+        msg:
+        - "instance variables:"
+        - "domain: {{ instance_domain }}"
+        - "ssh key: {{ ansible_private_key_file }}"
+        - "nginx variables:"  
+        - "db_name: {{ psg.db_name }}"  
+        - "db_user: {{ psg.db_user }}" 
+                
+    - name: Find out if PostgreSQL is initialized
+      ansible.builtin.stat:
+        path: "/var/lib/pgsql/data/pg_hba.conf"
+      register: postgres_data
+
+    - name: Initialize PostgreSQL
+      ansible.builtin.shell: "postgresql-setup initdb"
+      when: not postgres_data.stat.exists
+ 
+    - name: Start and enable services
+      ansible.builtin.service: "name={{ item }} state=started enabled=yes"
+      with_items:
+        - postgresql                  
+ 
+    - name: Create app database
+      community.general.postgresql_db:
+        state: present
+        name: "{{ psg.db_name }}"
+      become: true
+      become_user: postgres
+
+    - name: Create db user
+      community.general.postgresql_user:
+        state: present
+        name: "{{ psg.db_user }}"
+        password: "{{ db_password }}"
+      become: true
+      become_user: postgres
+
+    - name: Grant db user access to app db
+      community.general.postgresql_privs:
+        type: database
+        database: "{{ psg.db_name }}"
+        roles: "{{ psg.db_user }}"
+        grant_option: no
+        privs: all
+      become: true
+      become_user: postgres
+
+    - name: Allow md5 connection for the db user
+      community.general.postgresql_pg_hba:
+        dest: "~/data/pg_hba.conf"
+        contype: host
+        databases: all
+        method: md5
+        users: "{{ psg.db_user }}"
+        create: true
+      become: true
+      become_user: postgres
+      notify: restart postgres
+      
+    - name: Load create tables migration script
+      ansible.builtin.set_fact:
+        create_tables_sql: "{{ lookup('file', 'postgresql/ddl/create_tables.sql') }}"
+        
+    - name: Check create tables migration has run
+      community.postgresql.postgresql_query:
+        db: "{{ psg.db_name }}"
+        query: "SELECT EXISTS (SELECT * FROM pg_tables WHERE  tablename  = 'migrations')"
+      become: true
+      become_user: postgres
+      register: create_tables_migration_has_run
+      
+    - name: Run create tables migration
+      postgresql_query:
+        db: "{{ psg.db_name }}"
+        query: "{{ create_tables_sql }}"
+      become: true
+      become_user: postgres
+      when: create_tables_migration_has_run.query_result[0].exists is false  
+
+    - name: Load accounts migration script
+      ansible.builtin.set_fact:
+        accounts_sql: "{{ lookup('file', 'postgresql/dml/accounts.sql') }}"
+        
+    - name: Check accounts migration has run
+      community.postgresql.postgresql_query:
+        db: "{{ psg.db_name }}"
+        query: "SELECT EXISTS (SELECT * FROM migrations WHERE  name  = 'accounts')"
+      become: true
+      become_user: postgres
+      register: accounts_migration_has_run
+      
+    - name: Run accounts migration
+      postgresql_query:
+        db: "{{ psg.db_name }}"
+        query: "{{ accounts_sql }}"
+      become: true
+      become_user: postgres
+      when: accounts_migration_has_run.query_result[0].exists is false      
+        
+        
+        
+        

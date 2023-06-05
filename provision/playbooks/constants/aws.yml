@@ -1,0 +1,7 @@
+---
+
+aws_user: awsadmin
+download_dir: /home/{{ aws_user }}/download
+venv_path: /home/{{ aws_user }}/.pythonvenv
+
+...

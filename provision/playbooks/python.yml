@@ -1,0 +1,108 @@
+- name: Install python 3.9.6
+  hosts:
+    - all
+
+  gather_facts: false
+  vars_files:
+    - constants/python.yml
+    - constants/urls.yml
+    - constants/aws.yml
+ 
+  pre_tasks:
+  
+    - name: upgrade all packages
+      ansible.builtin.yum: name=* state=latest 
+           
+    - name: Installs a list of packages 
+      ansible.builtin.yum:
+        name:
+          - gcc
+          - openssl
+          - bzip2-devel 
+          - libffi-devel 
+          - zlib-devel
+
+    - name: Create download directory
+      ansible.builtin.file:
+        path: "{{ download_dir }}"
+        state: directory
+        owner: "{{ aws_user }}"
+        group: "{{ aws_user }}"
+        mode: 488         
+ 
+  tasks:
+  
+    - name: Find out if python 3.9 is installed
+      ansible.builtin.stat:
+        path: "{{ python_dir }}/{{ python_exec }}"
+      register: python_data   
+      
+    - debug:
+        var: python_data.stat.exists     
+
+    - name: Download python archive
+      ansible.builtin.get_url:
+        url: "{{ python_download_url }}"
+        dest: "{{ download_dir }}"
+        owner: "{{ aws_user }}"
+        group: "{{ aws_user }}"
+      when: not python_data.stat.exists   
+        
+    - name: Unarchive python
+      ansible.builtin.unarchive:
+        src: "{{ download_dir }}/{{ python_version }}.tgz"
+        dest: "{{ download_dir }}"
+        remote_src: true
+      when: not python_data.stat.exists
+        
+    - name: Initialize python
+      ansible.builtin.shell: "cd {{ download_dir }}/{{ python_version }}  && ./configure --enable-optimizations"
+      when: not python_data.stat.exists
+       
+    - name: Make python
+      ansible.builtin.shell: "cd {{ download_dir }}/{{ python_version }}  && make"
+      when: not python_data.stat.exists
+      
+    - name: Build python
+      ansible.builtin.shell: "cd {{ download_dir }}/{{ python_version }}  && make altinstall"
+      when: not python_data.stat.exists
+      
+    - name: Find out if python 3.9 is installed
+      ansible.builtin.stat:
+        path: "{{ python_dir }}/{{ python_exec }}"
+      register: python_data   
+      
+    - debug:
+        var: python_data.stat.exists 
+        
+    - name: Find out if pip 3.9 is installed
+      ansible.builtin.stat:
+        path: "{{ python_dir }}/{{ pip_exec }}"
+      register: pip_data   
+      
+    - debug:
+        var: pip_data.stat.exists 
+        
+    - name: symlink /usr/bin/python -> {{ python_dir }}/{{ python_exec }}
+      raw: |
+          rm -f /usr/bin/python
+          rm -f /usr/bin/pip3
+          ln --symbolic {{ python_dir }}/{{ python_exec }} /usr/bin/python; 
+          ln --symbolic {{ python_dir }}/{{ pip_exec }} /usr/bin/pip3; 
+      become: true                  
+
+    - name: Create python virtualenv
+      pip:
+        name:
+          - pip
+        state: latest
+        virtualenv: "{{ venv_path }}"
+        virtualenv_command: "python -m venv" 
+        
+  post_tasks:
+  
+    - name: Delete download directory
+      ansible.builtin.file:
+        path: "{{ download_dir }}"
+        state: absent
+        

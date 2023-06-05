@@ -1,0 +1,5 @@
+boto3==1.26.146
+botocore==1.29.146
+Jinja2==3.1.2
+moto==4.1.10
+pytest==7.3.1

@@ -1,0 +1,18 @@
+- name: Installs common programs
+  hosts:
+    - all
+  gather_facts: false
+  tasks:
+    - name: update yum cache
+      ansible.builtin.yum: update_cache=true
+  
+    - name: upgrade all packages
+      ansible.builtin.yum: name=* state=latest 
+                         
+    - name: Install a list of packages 
+      ansible.builtin.yum:
+        name:
+          - supervisor
+          - git
+          - vim         
+        state: present
