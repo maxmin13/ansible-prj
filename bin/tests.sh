@@ -10,7 +10,7 @@ set -o nounset
 set +o xtrace
   
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
-export PYTHONPATH="${PROJECT_DIR}/project"
+export PYTHONPATH="${PROJECT_DIR}/src"
 source "${PROJECT_DIR}"/../../bin/activate
 
 cd "${PROJECT_DIR}"/tests

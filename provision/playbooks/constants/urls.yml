@@ -1,5 +1,7 @@
 ---
-
-python_download_url: https://www.python.org/ftp/python/3.9.6/{{ python_version }}.tgz
+python_download_url: https://www.python.org/ftp/python/{{ python_version }}/{{ python_archive }}
 mezzanine_download_url: git@github.com:ansiblebook/mezzanine_example.git
+openssl_download_url: https://ftp.openssl.org/source/{{ openssl_archive }}
 ...
+
+

@@ -9,7 +9,7 @@ set -o nounset
 set +o xtrace
   
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && cd .. && pwd)"
-export PYTHONPATH="${PROJECT_DIR}/project"
+export PYTHONPATH="${PROJECT_DIR}/src"
 source "${PROJECT_DIR}"/../../bin/activate
 
-python "${PROJECT_DIR}/project/com/maxmin/aws/startup.py" "${PROJECT_DIR}/config/cms_datacenter.json" 
+python "${PROJECT_DIR}/src/com/maxmin/aws/startup.py" "${PROJECT_DIR}/config/cms_datacenter.json" 

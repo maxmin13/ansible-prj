@@ -1,22 +1,32 @@
 - name: Configure a webserver with nginx
   hosts:
     - class_webserver
+    
   gather_facts: true
+  
+  vars_files:
+    - constants/instance.yml
+    
   handlers:
-    - name: Restart nginx
+    - name: 'Restart nginx'
       ansible.builtin.service:
         name: nginx
         state: restarted
+        
+  pre_tasks:
+    - name: upgrade all packages
+      ansible.builtin.yum: name=* state=latest  
+             
   tasks:
   
-    - name: Print out operating system details
+    - name: 'Print out operating system details'
       ansible.builtin.debug:
         msg: 
         - "os_family: {{ ansible_facts.os_family }}"
         - "distro: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
         - "kernel: {{ ansible_facts.kernel }}" 
               
-    - name: Display variables
+    - name: 'Display variables'
       ansible.builtin.debug:
         msg:
         - "instance variables:"
@@ -35,16 +45,16 @@
       ansible.builtin.package:
         name: nginx
         update_cache: true
-      notify: Restart nginx
+      notify: Restart nginx        
       
-    - name: Create directories for nginx TLS certificates
+    - name: 'Create directories for nginx TLS certificates'
       ansible.builtin.file:
         path: '{{ nginx.tls_dir }}'
         state: directory
         mode: 488
       notify: Restart nginx
       
-    - name: Copy nginx TLS files
+    - name: 'Copy nginx TLS files'
       copy:
         src: '{{ item }}'
         dest: '{{ nginx.tls_dir }}'
@@ -54,7 +64,7 @@
         - 'nginx/{{ instance_domain }}/{{ nginx.cert_file }}'
       notify: Restart nginx
       
-    - name: Nginx config file
+    - name: 'Nginx config file'
       ansible.builtin.template:
         src: nginx/nginx.conf.j2
         dest: '{{ nginx.install_dir }}/nginx.conf'
@@ -63,7 +73,7 @@
       vars:
         server_name: '{{ nginx.server_name }}'
         
-    - name: Copy index.html
+    - name: 'Copy index.html file'
       ansible.builtin.template:
         src: nginx/index.html.j2
         dest: '{{ nginx.root_dir }}/index.html'
@@ -72,17 +82,17 @@
     - name: Restart nginx
       meta: flush_handlers
       
-    - name: Test it! http://{{ instance_domain }}:{{ nginx.http_port }}/index.html
+    - name: 'Test it! http://{{ instance_domain }}:{{ nginx.http_port }}/index.html'
       become: false
       uri:
         url: 'http://{{ instance_domain }}:{{ nginx.http_port }}/index.html'
         method: GET
         status_code: 200
         return_content: true
-      register: this
-      failed_when: "'Running on ' not in this.content"
+      register: result
+      failed_when: "'Running on ' not in result.content"
       
-    - name: Test it! https://{{ instance_domain }}:{{ nginx.https_port }}/index.html
+    - name: 'xxx'
       become: false
       uri:
         url: 'https://{{ instance_domain }}:{{ nginx.https_port }}/index.html'
@@ -91,7 +101,7 @@
         validate_certs: false
         return_content: true
       register: result
-
-      
+      vars:
+        ansible_python_interpreter: '{{ python_dir }}/{{ python_exec }}'
 ...
       

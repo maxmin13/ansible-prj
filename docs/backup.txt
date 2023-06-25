@@ -1,0 +1,7 @@
+    - name: symlink /usr/bin/python -> {{ python_dir }}/{{ python_exec }}
+      raw: |
+          rm -f /usr/bin/python
+          rm -f /usr/bin/pip3
+          ln --symbolic /usr/bin/python2 /usr/bin/python; 
+          ln --symbolic {{ python_dir }}/{{ pip_exec }} /usr/bin/pip3; 
+      become: true  

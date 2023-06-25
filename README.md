@@ -1,4 +1,4 @@
-# AWS Ansible project.
+# AWS Ansible project
 
 The project creates a datacenter in the AWS cloud.</br>
 Python is used to create the the AWS objects (VPC, subnets, security groups, instances and DNS records),</br>
@@ -7,7 +7,7 @@ Ansible scripts to provision the instances.
 **Requirements**:
 
 - Fedora 34
-- Python 3.11.2
+- Python 3
 - boto3 1.26.146
 - botocore 1.29.146
 - Jinja2 3.1.2

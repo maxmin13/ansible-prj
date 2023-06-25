@@ -1,0 +1,119 @@
+{
+  "Datacenter": {
+    "Description": "AWS VPC for CMS application",
+    "Name": "maxmin-datacenter",
+    "Cidr": "10.0.0.0/16",
+    "DnsName": "10.0.0.2",
+    "Region": "eu-west-1",
+    "InternetGateway": "maxmin-gateway",
+    "RouteTable": "maxmin-routetable",
+    "Subnets": [
+      {
+        "Description": " AWS network shared by the instances.",
+        "Name": "cms-subnet",
+        "Az": "eu-west-1a",
+        "Cidr": "10.0.10.0/24"
+      }
+    ],
+    "SecurityGroups": [
+      {
+        "Description": "Cms instance security group.",
+        "Name": "guest-sgp",
+        "Rules": [
+          {
+            "FromPort": -1,
+            "ToPort": -1,
+            "Protocol": "icmp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "ping access"
+          },
+          {
+            "FromPort": 22,
+            "ToPort": 22,
+            "Protocol": "tcp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "ssh access"
+          },
+          {
+            "FromPort": 8080,
+            "ToPort": 8080,
+            "Protocol": "tcp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "ssh access"
+          },
+          {
+            "FromPort": 8443,
+            "ToPort": 8443,
+            "Protocol": "tcp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "ssh access"
+          }
+        ]
+      },
+      {
+        "Description": "Database instance security group.",
+        "Name": "db-sgp",
+        "Rules": [
+          {
+            "FromPort": -1,
+            "ToPort": -1,
+            "Protocol": "icmp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "ping access"
+          },
+          {
+            "FromPort": 22,
+            "ToPort": 22,
+            "Protocol": "tcp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "ssh access"
+          }
+        ]
+      }
+    ],
+    "Instances": [
+      {
+        "UserName": "awsadmin",
+        "UserPassword": "awsadmin",
+        "PrivateIp": "10.0.10.35",
+        "DnsName": "db.maxmin.it",
+        "Hostname": "db.maxmin.it",
+        "SecurityGroup": "db-sgp",
+        "Subnet": "cms-subnet",
+        "Keypair": "db-key",
+        "ParentImage": "amzn2-ami-hvm-2.0.20210701.0-x86_64-gp2",
+        "Tags": [
+          {
+            "Key": "Class",
+            "Value": "database"
+          },
+          {
+            "Key": "Name",
+            "Value": "db-box"
+          }
+        ]
+      },
+      {
+        "UserName": "awsadmin",
+        "UserPassword": "awsadmin",
+        "PrivateIp": "10.0.10.37",
+        "DnsName": "guest.maxmin.it",
+        "Hostname": "guest.maxmin.it",
+        "SecurityGroup": "guest-sgp",
+        "Subnet": "cms-subnet",
+        "Keypair": "guest-key",
+        "ParentImage": "amzn2-ami-hvm-2.0.20210701.0-x86_64-gp2",
+        "Tags": [
+          {
+            "Key": "Class",
+            "Value": "webserver"
+          },
+          {
+            "Key": "Name",
+            "Value": "guest-box"
+          }
+        ]
+      }
+    ]
+  }
+}

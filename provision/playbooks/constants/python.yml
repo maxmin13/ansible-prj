@@ -1,4 +1,0 @@
-python_dir: /usr/local/bin
-python_exec: python3.9
-python_version: Python-3.9.6
-pip_exec: pip3.9

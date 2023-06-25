@@ -44,6 +44,8 @@ if __name__ == "__main__":
 
         found_instance = instance.load()
         record = Record(instance_config.dns_name, hosted_zone.id)
+        
+        Logger.info("Deleting DNS record ...")
 
         if record.load() is True:
             record.delete(instance.public_ip)

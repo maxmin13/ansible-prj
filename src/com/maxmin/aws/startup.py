@@ -214,6 +214,8 @@ if __name__ == "__main__":
         hosted_zone = HostedZone(route53Constants.registered_domain)
         hosted_zone.load()
         record = Record(instance_config.dns_name, hosted_zone.id)
+        
+        Logger.info("Creating DNS record ...")
 
         if record.load() is False:
             record.create(instance.public_ip)

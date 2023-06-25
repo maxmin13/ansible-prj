@@ -8,6 +8,8 @@ cd workspace/ansible-prj/provision
 
 # pipreqs module. It is used to scan your imports and build a Python requirements file for you.
 
+ansible-config list |grep python
+
 ansible-inventory --graph
 ansible-inventory --list
 

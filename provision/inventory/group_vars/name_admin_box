@@ -1,0 +1,2 @@
+instance_domain: admin.maxmin.it
+ansible_private_key_file: /home/vagrant/python_venv/workspace/ansible-prj/access/admin-key
