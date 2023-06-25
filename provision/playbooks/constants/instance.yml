@@ -8,7 +8,6 @@ python_archive_nm: Python-3.11.2
 python_archive: "{{ python_archive_nm }}.tar.xz"
 python_version: "3.11.2"
 python_exec: python3.11
-pip_exec: pip3.11
 venv_path: /home/{{ aws_user }}/.pythonvenv
 
 openssl_dir: /opt/openssl
