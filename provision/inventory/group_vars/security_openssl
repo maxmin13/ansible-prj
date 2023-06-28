@@ -1,0 +1,10 @@
+
+openssl_version: "1.1.1u"
+
+openssl:
+  dir: /opt/openssl
+  version: "{{ openssl_version }}"
+  archive_nm: "openssl-{{ openssl_version }}"
+  archive: "openssl-{{ openssl_version }}.tar.gz"
+  download_url: "https://ftp.openssl.org/source/openssl-{{ openssl_version }}.tar.gz"
+  exec: openssl

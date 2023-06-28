@@ -1,11 +1,11 @@
 - name: Configure a webserver with nginx
   hosts:
-    - class_webserver
+    - webserver_nginx
     
   gather_facts: true
   
   vars_files:
-    - constants/instance.yml
+    - constants/aws.yml
     
   handlers:
     - name: 'Restart nginx'
@@ -92,7 +92,7 @@
       register: result
       failed_when: "'Running on ' not in result.content"
       
-    - name: 'xxx'
+    - name: 'Test it! https://{{ instance_domain }}:{{ nginx.https_port }}/index.html'
       become: false
       uri:
         url: 'https://{{ instance_domain }}:{{ nginx.https_port }}/index.html'
@@ -101,7 +101,6 @@
         validate_certs: false
         return_content: true
       register: result
-      vars:
-        ansible_python_interpreter: '{{ python_dir }}/{{ python_exec }}'
+      failed_when: "'Running on ' not in result.content"
 ...
       

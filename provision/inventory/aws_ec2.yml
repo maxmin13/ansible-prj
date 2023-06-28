@@ -6,6 +6,14 @@ keyed_groups:
     prefix: name
   - key: tags.Class
     prefix: class
+  - key: tags.Database
+    prefix: database 
+  - key: tags.Security
+    prefix: security
+  - key: tags.Program
+    prefix: program 
+  - key: tags.Webserver
+    prefix: webserver            
 filters:
   instance-state-name: running
 compose:

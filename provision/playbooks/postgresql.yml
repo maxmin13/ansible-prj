@@ -1,6 +1,6 @@
 - name: Configure an instance with postgres
   hosts:
-    - class_db
+    - database_postgress
   gather_facts: false
   vars_files:
     - constants/secrets.yml
@@ -25,7 +25,6 @@
       with_items:
         - psycopg2-binary
 
-  
   tasks: 
     - name: Display variables
       ansible.builtin.debug:
@@ -34,8 +33,8 @@
         - "domain: {{ instance_domain }}"
         - "ssh key: {{ ansible_private_key_file }}"
         - "nginx variables:"  
-        - "db_name: {{ psg.db_name }}"  
-        - "db_user: {{ psg.db_user }}" 
+        - "db_name: {{ postgress.db_name }}"  
+        - "db_user: {{ postgress.db_user }}" 
                 
     - name: Find out if PostgreSQL is initialized
       ansible.builtin.stat:
@@ -54,14 +53,14 @@
     - name: Create app database
       community.general.postgresql_db:
         state: present
-        name: "{{ psg.db_name }}"
+        name: "{{ postgress.db_name }}"
       become: true
       become_user: postgres
 
     - name: Create db user
       community.general.postgresql_user:
         state: present
-        name: "{{ psg.db_user }}"
+        name: "{{ postgress.db_user }}"
         password: "{{ db_password }}"
       become: true
       become_user: postgres
@@ -69,8 +68,8 @@
     - name: Grant db user access to app db
       community.general.postgresql_privs:
         type: database
-        database: "{{ psg.db_name }}"
-        roles: "{{ psg.db_user }}"
+        database: "{{ postgress.db_name }}"
+        roles: "{{ postgress.db_user }}"
         grant_option: no
         privs: all
       become: true
@@ -82,7 +81,7 @@
         contype: host
         databases: all
         method: md5
-        users: "{{ psg.db_user }}"
+        users: "{{ postgress.db_user }}"
         create: true
       become: true
       become_user: postgres
@@ -94,7 +93,7 @@
         
     - name: Check create tables migration has run
       community.postgresql.postgresql_query:
-        db: "{{ psg.db_name }}"
+        db: "{{ postgress.db_name }}"
         query: "SELECT EXISTS (SELECT * FROM pg_tables WHERE  tablename  = 'migrations')"
       become: true
       become_user: postgres
@@ -102,7 +101,7 @@
       
     - name: Run create tables migration
       postgresql_query:
-        db: "{{ psg.db_name }}"
+        db: "{{ postgress.db_name }}"
         query: "{{ create_tables_sql }}"
       become: true
       become_user: postgres
@@ -114,7 +113,7 @@
         
     - name: Check accounts migration has run
       community.postgresql.postgresql_query:
-        db: "{{ psg.db_name }}"
+        db: "{{ postgress.db_name }}"
         query: "SELECT EXISTS (SELECT * FROM migrations WHERE  name  = 'accounts')"
       become: true
       become_user: postgres
@@ -122,7 +121,7 @@
       
     - name: Run accounts migration
       postgresql_query:
-        db: "{{ psg.db_name }}"
+        db: "{{ postgress.db_name }}"
         query: "{{ accounts_sql }}"
       become: true
       become_user: postgres

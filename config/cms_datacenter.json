@@ -33,6 +33,20 @@
             "Protocol": "tcp",
             "Cidr": "0.0.0.0/0",
             "Description": "ssh access"
+          },
+          {
+            "FromPort": 8080,
+            "ToPort": 8080,
+            "Protocol": "tcp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "http access"
+          },
+          {
+            "FromPort": 8443,
+            "ToPort": 8443,
+            "Protocol": "tcp",
+            "Cidr": "0.0.0.0/0",
+            "Description": "https access"
           }
         ]
       }
@@ -50,12 +64,28 @@
         "ParentImage": "amzn2-ami-hvm-2.0.20210701.0-x86_64-gp2",
         "Tags": [
           {
+            "Key": "Name",
+            "Value": "admin-box"
+          },
+          {
             "Key": "Class",
             "Value": "admin"
           },
           {
-            "Key": "Name",
-            "Value": "admin-box"
+            "Key": "Database",
+            "Value": "postgress"
+          },
+          {
+            "Key": "Program",
+            "Value": "python"
+          },
+          {
+            "Key": "Security",
+            "Value": "openssl"
+          },
+          {
+            "Key": "Webserver",
+            "Value": "nginx"
           }
         ]
       }

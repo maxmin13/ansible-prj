@@ -4,8 +4,7 @@
 
   gather_facts: false
   vars_files:
-    - constants/urls.yml
-    - constants/instance.yml
+    - constants/aws.yml
  
   pre_tasks:
   
@@ -36,47 +35,47 @@
           
     - name: Create download directory
       ansible.builtin.file:
-        path: "{{ download_dir }}"
+        path: "{{ aws.instance.download_dir }}"
         state: directory
-        owner: "{{ aws_user }}"
-        group: "{{ aws_user }}"
+        owner: "{{ aws.instance.user }}"
+        group: "{{ aws.instance.user }}"
         mode: 488         
  
   tasks:
   
     - name: Download python archive
       ansible.builtin.get_url:
-        url: "{{ python_download_url }}"
-        dest: "{{ download_dir }}"
-        owner: "{{ aws_user }}"
-        group: "{{ aws_user }}" 
+        url: "{{ python.download_url }}"
+        dest: "{{ aws.instance.download_dir }}"
+        owner: "{{ aws.instance.user }}"
+        group: "{{ aws.instance.user }}" 
         
     - name: Unarchive python
       ansible.builtin.unarchive:
-        src: "{{ download_dir }}/{{ python_archive }}"
-        dest: "{{ download_dir }}"
+        src: "{{ aws.instance.download_dir }}/{{ python.archive }}"
+        dest: "{{ aws.instance.download_dir }}"
         remote_src: true
             
     - name: Initialize python
-      ansible.builtin.shell: "export LD_RUN_PATH={{ openssl_dir }}/lib && cd {{ download_dir }}/{{ python_archive_nm }} && ./configure --enable-optimizations --with-openssl={{ openssl_dir }} -C"
+      ansible.builtin.shell: "export LD_RUN_PATH={{ openssl.dir }}/lib && cd {{ aws.instance.download_dir }}/{{ python.archive_nm }} && ./configure --enable-optimizations --with-openssl={{ openssl.dir }} -C"
       
     - name: Make python
-      ansible.builtin.shell: "cd {{ download_dir }}/{{ python_archive_nm }} && make clean && make"
+      ansible.builtin.shell: "cd {{ aws.instance.download_dir }}/{{ python.archive_nm }} && make clean && make"
       
     - name: Build python
-      ansible.builtin.shell: "cd {{ download_dir }}/{{ python_archive_nm }} && make altinstall"
+      ansible.builtin.shell: "cd {{ aws.instance.download_dir }}/{{ python.archive_nm }} && make altinstall"
       
     - name: Create virtualenv
       ansible.builtin.pip:
         name:
           - pip
         state: latest
-        virtualenv: "{{ venv_path }}"
-        virtualenv_command: "{{ python_dir }}/{{ python_exec }} -m venv"   
+        virtualenv: "{{ python.venv_path }}"
+        virtualenv_command: "{{ python.dir }}/{{ python.executable }} -m venv"   
 
   post_tasks:
   
     - name: Delete download directory
       ansible.builtin.file:
-        path: "{{ download_dir }}"
+        path: "{{ aws.instance.download_dir }}"
         state: absent        
