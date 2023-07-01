@@ -5,11 +5,20 @@
   gather_facts: false
   vars_files:
     - constants/aws.yml
+    - constants/controller.yml
  
   pre_tasks:
-  
-    - name: Upgrade all packages
-      ansible.builtin.yum: name=* state=latest 
+      
+    - name: 'Controller host'
+      ansible.builtin.debug:
+        msg:
+        - "domain: {{ instance_domain }}"
+        - "ssh port: {{ ansible_port }}"
+        - "ssh user: {{ ansible_user }}"
+        - "ssh key: {{ ansible_private_key_file }}"
+        
+    - name: upgrade all packages
+      ansible.builtin.yum: name=* state=latest         
            
     - name: Install a list of packages 
       ansible.builtin.yum:
@@ -19,7 +28,7 @@
           
     - name: Create download directory
       ansible.builtin.file:
-        path: "{{ aws.instance.download_dir }}"
+        path: "{{ aws.instance.download.dir }}"
         state: directory
         owner: "{{ aws.instance.user }}"
         group: "{{ aws.instance.user }}"
@@ -33,27 +42,27 @@
     - name: Download openssl archive
       ansible.builtin.get_url:
         url: "{{ openssl.download_url }}"
-        dest: "{{ aws.instance.download_dir }}"
+        dest: "{{ aws.instance.download.dir }}"
         owner: "{{ aws.instance.user }}"
         group: "{{ aws.instance.user }}" 
         
     - name: Unarchive openssl
       ansible.builtin.unarchive:
-        src: "{{ aws.instance.download_dir }}/{{ openssl.archive }}"
-        dest: "{{ aws.instance.download_dir }}"
+        src: "{{ aws.instance.download.dir }}/{{ openssl.archive }}"
+        dest: "{{ aws.instance.download.dir }}"
         remote_src: true
       
     - name: Initialize openssl
-      ansible.builtin.shell: "cd {{ aws.instance.download_dir }}/{{ openssl.archive_nm }} && ./config --prefix={{ openssl.dir }} --openssldir={{ openssl.dir }}"
+      ansible.builtin.shell: "cd {{ aws.instance.download.dir }}/{{ openssl.archive_nm }} && ./config --prefix={{ openssl.dir }} --openssldir={{ openssl.dir }}"
       
     - name: Build openssl
-      ansible.builtin.shell: "cd {{ aws.instance.download_dir }}/{{ openssl.archive_nm }} && make clean && make depend && make"
+      ansible.builtin.shell: "cd {{ aws.instance.download.dir }}/{{ openssl.archive_nm }} && make clean && make depend && make"
       
     - name: Test openssl
-      ansible.builtin.shell: "cd {{ aws.instance.download_dir }}/{{ openssl.archive_nm }} && make test"  
+      ansible.builtin.shell: "cd {{ aws.instance.download.dir }}/{{ openssl.archive_nm }} && make test"  
       
     - name: Install openssl
-      ansible.builtin.shell: "cd {{ aws.instance.download_dir }}/{{ openssl.archive_nm }} && make install"   
+      ansible.builtin.shell: "cd {{ aws.instance.download.dir }}/{{ openssl.archive_nm }} && make install"   
       
     - name: Configure openssl
       ansible.builtin.shell: "sh -c 'echo /opt/openssl/lib/' > /etc/ld.so.conf.d/openssl-1.1.1t.conf"
@@ -80,5 +89,5 @@
   
     - name: Delete download directory
       ansible.builtin.file:
-        path: "{{ aws.instance.download_dir }}"
+        path: "{{ aws.instance.download.dir }}"
         state: absent                 

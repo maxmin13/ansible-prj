@@ -1,4 +1,4 @@
 
-rm -f ~/.ssh/known_hosts && ssh -v -i admin-key -p 22 awsadmin@3.250.56.198
+rm -f ~/.ssh/known_hosts && ssh -v -i admin-key -p 22 awsadmin@	54.171.252.224
 
 rm -f ~/.ssh/known_hosts && ssh -v -i guest-key -p 22 awsadmin@34.244.122.204

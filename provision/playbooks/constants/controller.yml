@@ -1,0 +1,11 @@
+---
+
+controller:
+  project:
+    dir: "/home/vagrant/python_venv/workspace/ansible-prj"
+
+
+
+
+
+...

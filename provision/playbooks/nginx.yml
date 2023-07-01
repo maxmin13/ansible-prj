@@ -6,6 +6,7 @@
   
   vars_files:
     - constants/aws.yml
+    - constants/controller.yml
     
   handlers:
     - name: 'Restart nginx'
@@ -14,32 +15,26 @@
         state: restarted
         
   pre_tasks:
-    - name: upgrade all packages
-      ansible.builtin.yum: name=* state=latest  
-             
-  tasks:
-  
-    - name: 'Print out operating system details'
+      
+    - name: 'Remote host'
       ansible.builtin.debug:
         msg: 
         - "os_family: {{ ansible_facts.os_family }}"
         - "distro: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
-        - "kernel: {{ ansible_facts.kernel }}" 
-              
-    - name: 'Display variables'
+        - "kernel: {{ ansible_facts.kernel }}"      
+
+    - name: 'Controller host'
       ansible.builtin.debug:
         msg:
-        - "instance variables:"
         - "domain: {{ instance_domain }}"
+        - "ssh port: {{ ansible_port }}"
+        - "ssh user: {{ ansible_user }}"
         - "ssh key: {{ ansible_private_key_file }}"
-        - "nginx variables:"  
-        - "tls_dir: {{ nginx.tls_dir }}"  
-        - "key_file: {{ nginx.key_file }}" 
-        - "cert_file: {{ nginx.cert_file }}"   
-        - "install_dir: {{ nginx.install_dir }}" 
-        - "root_dir: {{ nginx.root_dir }}" 
-        - "http_port: {{ nginx.http_port }}"
-        - "https_port: {{ nginx.https_port }}" 
+
+    - name: upgrade all packages
+      ansible.builtin.yum: name=* state=latest  
+             
+  tasks:
                      
     - name: Ensure nginx is installed
       ansible.builtin.package:

@@ -5,8 +5,10 @@ aws_user: "awsadmin"
 aws:
   instance: 
     user: "{{ aws_user }}"
-    download_dir: /home/{{ aws_user }}/download
-    application_dir: /home/{{ aws_user }}/cms
+    download:
+      dir: /home/{{ aws_user }}/download
+    application:
+      dir: /home/{{ aws_user }}/cms
 
 
 
