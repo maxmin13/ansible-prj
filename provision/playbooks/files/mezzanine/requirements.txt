@@ -1,0 +1,6 @@
+Mezzanine==6.0.0
+gunicorn
+setproctitle
+psycopg2-binary
+django-compressor
+python-memcached

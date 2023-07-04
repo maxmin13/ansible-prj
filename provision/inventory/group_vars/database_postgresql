@@ -1,0 +1,9 @@
+---
+db:
+  postgresql:
+    name: postgressdb
+    user:
+      admin:
+        postgressadmin
+        
+...

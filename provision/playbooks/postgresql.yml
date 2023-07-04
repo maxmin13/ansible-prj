@@ -1,6 +1,6 @@
 - name: Configure an instance with postgres
   hosts:
-    - database_postgress
+    - database_postgresql
   gather_facts: false
   vars_files:
     - constants/aws.yml
@@ -16,7 +16,7 @@
     - name: 'Controller host'
       ansible.builtin.debug:
         msg:
-        - "domain: {{ instance_domain }}"
+        - "domain: {{ aws_instance_dns_domain }}"
         - "ssh port: {{ ansible_port }}"
         - "ssh user: {{ ansible_user }}"
         - "ssh key: {{ ansible_private_key_file }}"
@@ -25,15 +25,6 @@
       ansible.builtin.yum: name=* state=latest  
            
   tasks: 
-    - name: Display variables
-      ansible.builtin.debug:
-        msg:
-        - "instance variables:"
-        - "domain: {{ instance_domain }}"
-        - "ssh key: {{ ansible_private_key_file }}"
-        - "nginx variables:"  
-        - "db_name: {{ postgress.db_name }}"  
-        - "db_user: {{ postgress.db_user }}" 
 
     - name: Install a list of packages 
       ansible.builtin.yum:
@@ -55,31 +46,31 @@
       ansible.builtin.shell: "postgresql-setup initdb"
       when: not postgres_data.stat.exists
  
-    - name: Start and enable services
+    - name: Start database
       ansible.builtin.service: "name={{ item }} state=started enabled=yes"
       with_items:
-        - postgresql                  
- 
+        - postgresql    
+                    
     - name: Create app database
       community.general.postgresql_db:
         state: present
-        name: "{{ postgress.db_name }}"
+        name: "{{ db.postgresql.name }}"
       become: true
       become_user: postgres
 
     - name: Create db user
       community.general.postgresql_user:
         state: present
-        name: "{{ postgress.db_user }}"
-        password: "{{ db_password }}"
+        name: "{{ db.postgresql.user.admin }}"
+        password: "{{ database.password }}"
       become: true
       become_user: postgres
 
     - name: Grant db user access to app db
       community.general.postgresql_privs:
         type: database
-        database: "{{ postgress.db_name }}"
-        roles: "{{ postgress.db_user }}"
+        database: "{{ db.postgresql.name }}"
+        roles: "{{ db.postgresql.user.admin }}"
         grant_option: no
         privs: all
       become: true
@@ -91,7 +82,7 @@
         contype: host
         databases: all
         method: md5
-        users: "{{ postgress.db_user }}"
+        users: "{{ db.postgresql.user.admin }}"
         create: true
       become: true
       become_user: postgres
@@ -103,7 +94,7 @@
         
     - name: Check create tables migration has run
       community.postgresql.postgresql_query:
-        db: "{{ postgress.db_name }}"
+        db: "{{ db.postgresql.name }}"
         query: "SELECT EXISTS (SELECT * FROM pg_tables WHERE  tablename  = 'migrations')"
       become: true
       become_user: postgres
@@ -111,7 +102,7 @@
       
     - name: Run create tables migration
       postgresql_query:
-        db: "{{ postgress.db_name }}"
+        db: "{{ db.postgresql.name }}"
         query: "{{ create_tables_sql }}"
       become: true
       become_user: postgres
@@ -123,7 +114,7 @@
         
     - name: Check accounts migration has run
       community.postgresql.postgresql_query:
-        db: "{{ postgress.db_name }}"
+        db: "{{ db.postgresql.name }}"
         query: "SELECT EXISTS (SELECT * FROM migrations WHERE  name  = 'accounts')"
       become: true
       become_user: postgres
@@ -131,7 +122,7 @@
       
     - name: Run accounts migration
       postgresql_query:
-        db: "{{ postgress.db_name }}"
+        db: "{{ db.postgresql.name }}"
         query: "{{ accounts_sql }}"
       become: true
       become_user: postgres

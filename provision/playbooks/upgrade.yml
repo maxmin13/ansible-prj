@@ -12,7 +12,7 @@
     - name: 'Controller host'
       ansible.builtin.debug:
         msg:
-        - "domain: {{ instance_domain }}"
+        - "domain: {{ aws_instance_dns_domain }}"
         - "ssh port: {{ ansible_port }}"
         - "ssh user: {{ ansible_user }}"
         - "ssh key: {{ ansible_private_key_file }}"

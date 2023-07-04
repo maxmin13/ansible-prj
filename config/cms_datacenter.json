@@ -69,11 +69,11 @@
           },
           {
             "Key": "Class",
-            "Value": "admin"
+            "Value": "cms"
           },
           {
             "Key": "Database",
-            "Value": "postgress"
+            "Value": "postgresql"
           },
           {
             "Key": "Program",

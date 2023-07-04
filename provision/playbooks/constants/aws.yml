@@ -1,17 +1,11 @@
 ---
 
-aws_user: "awsadmin"
+AWS_USER: "awsadmin"
 
 aws:
   instance: 
-    user: "{{ aws_user }}"
+    user: "{{ AWS_USER }}"
     download:
-      dir: /home/{{ aws_user }}/download
-    application:
-      dir: /home/{{ aws_user }}/cms
-
-
-
-
-
+      path: /home/{{ AWS_USER }}/download
+      
 ...

@@ -1,0 +1,7 @@
+---
+cms:
+  mezzanine:
+    venv:
+      path: /home/{{ aws_user }}/.pythonvenv
+    
+...   

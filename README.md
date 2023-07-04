@@ -43,7 +43,7 @@ cd provision
 ansible-playbook -b -K playbooks/openssl.yml
 ```
 
-**Install Python 3.11.2 and create a virtual environment:** 
+**Install Python 3.11.2:** 
 
 ```
 cd provision

@@ -22,26 +22,26 @@ http {
     keepalive_timeout   65;
     types_hash_max_size 4096;
 
-    include             {{ nginx.install_dir }}/mime.types;
+    include             {{ nginx.install.path }}/mime.types;
     default_type        application/octet-stream;
 
-	include {{ nginx.install_dir }}/conf.d/*.conf;
+	include {{ nginx.install.path }}/conf.d/*.conf;
 
     server {
-        listen       {{ nginx.http_port }};
-        listen       [::]:{{ nginx.http_port }};
+        listen       {{ nginx.http.port }};
+        listen       [::]:{{ nginx.http.port }};
         
-        listen              {{ nginx.https_port }} ssl;
-	    ssl_certificate     {{ nginx.tls_dir }}/nginx.crt;
-	    ssl_certificate_key {{ nginx.tls_dir }}/nginx.key;
+        listen              {{ nginx.https.port }} ssl;
+	    ssl_certificate     {{ nginx.tls.path }}/{{ nginx.cert.file }};
+	    ssl_certificate_key {{ nginx.tls.path }}/{{ nginx.key.file }};
 	    ssl_protocols       TLSv1 TLSv1.1 TLSv1.2 TLSv1.3;
 	    ssl_ciphers         HIGH:!aNULL:!MD5;
         
         server_name {{ ansible_host }};
-        root         {{ nginx.root_dir }};
+        root         {{ nginx.root.path }};
 
         # Load configuration files for the default server block.
-        include {{ nginx.install_dir }}/default.d/*.conf;
+        include {{ nginx.install.path }}/default.d/*.conf;
 
         error_page 404 /404.html;
         location = /404.html {

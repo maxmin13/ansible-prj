@@ -1,11 +1,13 @@
-
-python_version: "3.11.2"
+---
+PYTHON_VERSION: "3.11.2"
 
 python:
-  download_url: "https://www.python.org/ftp/python/{{ python_version }}/Python-{{ python_version }}.tar.xz"
-  dir: /usr/local/bin
-  archive_nm: "Python-{{ python_version }}"
-  archive: "Python-{{ python_version }}.tar.xz"
-  version: "{{ python_version }}"
-  executable: python3.11
-  venv_path: /home/{{ aws.instance.user }}/.pythonvenv
+  download:
+    url: "https://www.python.org/ftp/python/{{ PYTHON_VERSION }}/Python-{{ PYTHON_VERSION }}.tar.xz"
+  path: /usr/local/bin
+  version: "{{ PYTHON_VERSION }}"
+  archive:
+    directory: "Python-{{ PYTHON_VERSION }}"
+    name: "Python-{{ PYTHON_VERSION }}.tar.xz"
+
+...

@@ -1,0 +1,59 @@
+- name: Install Mezzanine
+  hosts:
+    - class_cms
+
+  gather_facts: false
+  vars_files:
+    - constants/aws.yml
+    - constants/controller.yml
+ 
+  pre_tasks:
+      
+    - name: 'Controller host'
+      ansible.builtin.debug:
+        msg:
+        - "domain: {{ aws_instance_dns_domain }}"
+        - "ssh port: {{ ansible_port }}"
+        - "ssh user: {{ ansible_user }}"
+        - "ssh key: {{ ansible_private_key_file }}"
+  
+    - name: upgrade all packages
+      ansible.builtin.yum: name=* state=latest 
+                 
+    - name: Create download directory
+      ansible.builtin.file:
+        path: "{{ aws.instance.download.path }}"
+        state: directory
+        owner: "{{ aws.instance.user }}"
+        group: "{{ aws.instance.user }}"
+        mode: 488         
+ 
+  tasks:
+        
+    - name: Create virtualenv
+      ansible.builtin.pip:
+        name:
+          - pip
+          - wheel
+          - setuptools
+        state: latest
+        virtualenv: "{{ cms.mezzanine.venv.path }}"
+        virtualenv_command: "{{ python.path }}/{{ python.executable }} -m venv"   
+
+    - name: Upload Mezzanine requirements.txt
+      copy:
+        src: mezzanine/requirements.txt
+        dest: "{{ aws.instance.download.path }}"
+        mode: '0644'
+
+    - name: install packages listed in requirements.txt
+      pip:
+        virtualenv: "{{ cms.mezzanine.venv.path }}"
+        requirements: "{{ aws.instance.download.path }}/requirements.txt"
+
+  post_tasks:
+  
+    - name: Delete download directory
+      ansible.builtin.file:
+        path: "{{ aws.instance.download.path }}"
+        state: absent          

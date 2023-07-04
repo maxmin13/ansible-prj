@@ -1,8 +1,19 @@
+---
+
 nginx:
-  tls_dir: /etc/nginx/ssl/
-  key_file: nginx.key
-  cert_file: nginx.crt
-  install_dir: /etc/nginx
-  root_dir: /usr/share/nginx/html
-  http_port: 8080
-  https_port: 8443
+  install:
+     path: /etc/nginx
+  tls:
+    path: /etc/nginx/ssl/
+  key:
+    file: nginx.key
+  cert:
+    file: nginx.crt
+  root:
+    path: /usr/share/nginx/html
+  http:
+    port: 8080
+  https:
+    port: 8443
+    
+...    

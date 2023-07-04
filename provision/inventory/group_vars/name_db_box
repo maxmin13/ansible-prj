@@ -1,2 +1,4 @@
-instance_domain: db.maxmin.it
-ansible_private_key_file: "{{ controller.project.dir }}/access/db-key"
+
+aws_instance_dns_domain: db.maxmin.it
+
+ansible_private_key_file: /home/vagrant/python_venv/workspace/ansible-prj/access/db-key  
