@@ -62,7 +62,7 @@
       community.general.postgresql_user:
         state: present
         name: "{{ db.postgresql.user.admin }}"
-        password: "{{ database.password }}"
+        password: "{{ db.password }}"
       become: true
       become_user: postgres
 
