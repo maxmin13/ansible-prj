@@ -1,9 +1,10 @@
 ---
-db:
+
+database:
   postgresql:
-    name: postgressdb
+    name: "mezzaninedb"
     user:
-      admin:
-        postgressadmin
-        
+      admin: 
+        name: "mezzanineadmin" 
+
 ...

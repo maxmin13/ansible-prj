@@ -1,7 +1,15 @@
 ---
+
+PROJECT_NAME: "cms-mezzanine"
+
 cms:
-  mezzanine:
-    venv:
-      path: /home/{{ aws_user }}/.pythonvenv
-    
+  project:
+      name: "{{ PROJECT_NAME }}"
+      path: "/home/{{ aws.instance.user }}/{{ PROJECT_NAME }}" 
+      venv:
+        path: "/home/{{ aws.instance.user }}/.pythonvenv"   
+      logs:
+        path: "/home/{{ aws.instance.user }}/logs"
+      repository:
+        url: "git@github.com:ansiblebook/mezzanine_example.git"    
 ...   

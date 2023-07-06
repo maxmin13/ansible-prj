@@ -1,7 +1,6 @@
 - name: Install Mezzanine
   hosts:
     - class_cms
-
   gather_facts: false
   vars_files:
     - constants/aws.yml
@@ -9,7 +8,7 @@
  
   pre_tasks:
       
-    - name: 'Controller host'
+    - name: 'Controller host configuration'
       ansible.builtin.debug:
         msg:
         - "domain: {{ aws_instance_dns_domain }}"
@@ -17,7 +16,7 @@
         - "ssh user: {{ ansible_user }}"
         - "ssh key: {{ ansible_private_key_file }}"
   
-    - name: upgrade all packages
+    - name: Upgrade all packages
       ansible.builtin.yum: name=* state=latest 
                  
     - name: Create download directory
@@ -37,8 +36,8 @@
           - wheel
           - setuptools
         state: latest
-        virtualenv: "{{ cms.mezzanine.venv.path }}"
-        virtualenv_command: "{{ python.path }}/{{ python.executable }} -m venv"   
+        virtualenv: "{{ cms.project.venv.path }}"
+        virtualenv_command: "{{ python_path }}/{{ python_executable }} -m venv"   
 
     - name: Upload Mezzanine requirements.txt
       copy:
@@ -46,10 +45,34 @@
         dest: "{{ aws.instance.download.path }}"
         mode: '0644'
 
-    - name: install packages listed in requirements.txt
-      pip:
-        virtualenv: "{{ cms.mezzanine.venv.path }}"
+    - name: Install packages listed in requirements.txt
+      ansible.builtin.pip:
+        virtualenv: "{{ cms.project.venv.path }}"
         requirements: "{{ aws.instance.download.path }}/requirements.txt"
+
+    - name: Create a logs directory
+      become: false
+      ansible.builtin.file:
+        path: "{{ cms.project.logs.path }}"
+        state: directory
+        mode: 0755
+                
+    - name: Create project directory
+      become: false
+      ansible.builtin.file:
+        path: "{{ cms.project.path }}"
+        state: directory
+        mode: 0755  
+        
+    - name: Check out the repository on the host (with agent forwarding)
+      become: false
+      ansible.builtin.git:
+        repo: "{{ cms.project.repository.url }}"
+        dest: "{{ cms.project.path }}"
+        version: master
+        accept_hostkey: true
+        update: false               
+        
 
   post_tasks:
   

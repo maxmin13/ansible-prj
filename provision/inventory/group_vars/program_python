@@ -4,7 +4,6 @@ PYTHON_VERSION: "3.11.2"
 python:
   download:
     url: "https://www.python.org/ftp/python/{{ PYTHON_VERSION }}/Python-{{ PYTHON_VERSION }}.tar.xz"
-  path: /usr/local/bin
   version: "{{ PYTHON_VERSION }}"
   archive:
     directory: "Python-{{ PYTHON_VERSION }}"

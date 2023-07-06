@@ -2,3 +2,6 @@
 ansible_connection: ssh
 ansible_port: 22
 ansible_user: awsadmin
+
+python_executable: python3.11
+python_path: /usr/local/bin

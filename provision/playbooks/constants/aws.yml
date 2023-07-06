@@ -6,6 +6,7 @@ aws:
   instance: 
     user: "{{ AWS_USER }}"
     download:
-      path: /home/{{ AWS_USER }}/download
-      
+      path: /opt/download
+
+
 ...

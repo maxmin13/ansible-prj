@@ -9,7 +9,7 @@
     
   pre_tasks:
       
-    - name: 'Controller host'
+    - name: 'Controller host configuration'
       ansible.builtin.debug:
         msg:
         - "domain: {{ aws_instance_dns_domain }}"
@@ -31,3 +31,4 @@
           - git
           - vim         
         state: present
+        

@@ -23,7 +23,7 @@
         - "distro: {{ ansible_facts.distribution }} {{ ansible_facts.distribution_version }}"
         - "kernel: {{ ansible_facts.kernel }}"      
 
-    - name: 'Controller host'
+    - name: 'Controller host configuration'
       ansible.builtin.debug:
         msg:
         - "domain: {{ aws_instance_dns_domain }}"
@@ -31,7 +31,7 @@
         - "ssh user: {{ ansible_user }}"
         - "ssh key: {{ ansible_private_key_file }}"
 
-    - name: upgrade all packages
+    - name: Upgrade all packages
       ansible.builtin.yum: name=* state=latest  
              
   tasks:
