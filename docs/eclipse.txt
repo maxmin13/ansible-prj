@@ -1,4 +1,12 @@
 
+generate ssh key and upload it to github account:
+
+ssh-keygen -t rsa -b 4096 -C "minardi.massimiliano@libero.it"
+
+install eclipse pydev plugin from marketplace.
+
+clone the project:
+
 git clone git@github.com:maxmin13/ansible-prj.git
 
 open PyDev perspective
@@ -7,7 +15,7 @@ File, new PyDev project
 
 project name: ansible-prj
 select the root ansible-prj directory
-configure python3.9 interpreter
+configure python3.11 interpreter
 click finish
 
 Project, properties
